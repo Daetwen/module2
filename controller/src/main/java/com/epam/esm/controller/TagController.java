@@ -16,10 +16,12 @@ import java.util.List;
 @RequestMapping("/tags")
 public class TagController {
     private final TagService tagService;
+    private final LocaleManager localeManager;
 
     @Autowired
-    public TagController(TagService tagService) {
+    public TagController(TagService tagService, LocaleManager localeManager) {
         this.tagService = tagService;
+        this.localeManager = localeManager;
     }
 
     @RequestMapping(value="/tag_create",method = RequestMethod.POST)
@@ -39,7 +41,7 @@ public class TagController {
         TagDto tagDto = null;
         if (id == null && name == null) {
             throw new ControllerException(
-                    LocaleManager.getLocalizedMessage(LanguagePath.PARAMETERS_ERROR_NOT_FOUND));
+                    localeManager.getLocalizedMessage(LanguagePath.PARAMETERS_ERROR_NOT_FOUND));
         } else if (id == null && name != null) {
             tagDto = tagService.findByName(name);
         } else if (id != null && name == null) {

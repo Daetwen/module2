@@ -6,6 +6,7 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ServiceSearchException;
 import com.epam.esm.exception.ServiceValidationException;
 import com.epam.esm.service.TagService;
+import com.epam.esm.util.LocaleManager;
 import com.epam.esm.util.TagConverter;
 import com.epam.esm.validator.Validator;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +35,8 @@ public class TagServiceImplTest {
         tagDao = mock(TagDao.class);
         validator = mock(Validator.class);
         tagConverter = mock(TagConverter.class);
-        tagService = new TagServiceImpl(tagDao, validator, tagConverter);
+        LocaleManager localeManager = mock(LocaleManager.class);
+        tagService = new TagServiceImpl(tagDao, validator, tagConverter, localeManager);
         tagDtoTest1 = new TagDto(5L, "Hello");
         tagTest1 = new Tag(5L, "Hello");
     }
@@ -80,6 +82,21 @@ public class TagServiceImplTest {
     }
 
     @Test
+    public void findByIdTestFalse1() {
+        when(validator.validateId(anyString())).thenReturn(false);
+        assertThrows(ServiceValidationException.class,
+                () -> tagService.findById("f5g"));
+    }
+
+    @Test
+    public void findByIdTestFalse2() {
+        when(validator.validateId(anyString())).thenReturn(true);
+        when(tagDao.findById(anyLong())).thenReturn(Optional.empty());
+        assertThrows(ServiceSearchException.class,
+                () -> tagService.findById("5"));
+    }
+
+    @Test
     public void findByNameTestTrue() throws ServiceSearchException, ServiceValidationException {
         Optional<Tag> localTag = Optional.ofNullable(tagTest1);
         when(validator.validateName(anyString())).thenReturn(true);
@@ -87,6 +104,21 @@ public class TagServiceImplTest {
         when(tagConverter.convertTagToTegDto(any(Tag.class))).thenReturn(tagDtoTest1);
         TagDto actual = tagService.findByName("New Year");
         assertEquals(tagDtoTest1, actual);
+    }
+
+    @Test
+    public void findByNameTestFalse1() {
+        when(validator.validateName(anyString())).thenReturn(false);
+        assertThrows(ServiceValidationException.class,
+                () -> tagService.findByName("New Year"));
+    }
+
+    @Test
+    public void findByNameTestFalse2() {
+        when(validator.validateName(anyString())).thenReturn(true);
+        when(tagDao.findByName(anyString())).thenReturn(Optional.empty());
+        assertThrows(ServiceSearchException.class,
+                () -> tagService.findByName("New Year"));
     }
 
     @Test

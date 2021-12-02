@@ -1,9 +1,13 @@
 package com.epam.esm.dto;
 
+import com.epam.esm.entity.Certificate;
+import com.epam.esm.entity.Tag;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CertificateDto {
     private Long id;
@@ -115,5 +119,59 @@ public class CertificateDto {
                 this.tags.add(tag);
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        CertificateDto that = (CertificateDto) obj;
+        return id.equals(that.id)
+                && name.equals(that.name)
+                && Objects.equals(description, that.description)
+                && price.equals(that.price)
+                && duration == that.duration
+                && createDate.equals(that.createDate)
+                && lastUpdateDate.equals(that.lastUpdateDate)
+                && tags != null ? tags.equals(that.tags) : that.tags == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int prime = 31;
+        int result = 1;
+
+        result = result * prime + (id != null ? id.hashCode() : 0);
+        result = result * prime + (name != null ? name.hashCode() : 0);
+        result = result * prime + (description != null ? description.hashCode() : 0);
+        result = result * prime + (price != null ? price.hashCode() : 0);
+        result = result * prime + duration;
+        result = result * prime + (createDate != null ? createDate.hashCode() : 0);
+        result = result * prime + (lastUpdateDate != null ? lastUpdateDate.hashCode() : 0);
+        result = result * prime + (tags != null ? tags.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("CertificateDto { ")
+                .append("id = '").append(id).append('\'')
+                .append(", name = '").append(name).append('\'')
+                .append(", description = '").append(description).append('\'')
+                .append(", price = '").append(price).append('\'')
+                .append(", duration = '").append(duration).append('\'')
+                .append(", createDate = '").append(createDate).append('\'')
+                .append(", lastUpdateDate = '").append(lastUpdateDate).append('\'');
+        stringBuilder.append(", tags = [");
+        for(TagDto tag : tags) {
+            stringBuilder.append(tag).append(", ");
+        }
+        stringBuilder.append("] }\n");
+        return stringBuilder.toString();
     }
 }

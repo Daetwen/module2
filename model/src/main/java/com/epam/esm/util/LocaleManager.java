@@ -8,14 +8,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class LocaleManager {
 
-    private static MessageSource messageSource;
+    private MessageSource messageSource;
 
     @Autowired
     public LocaleManager(MessageSource messageSource) {
-        LocaleManager.messageSource = messageSource;
+        this.messageSource = messageSource;
     }
 
-    public static String getLocalizedMessage(String messagePath) {
+    public String getLocalizedMessage(String messagePath) {
         return messageSource.getMessage(messagePath, null, LocaleContextHolder.getLocale());
     }
 }

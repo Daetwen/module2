@@ -1,5 +1,7 @@
 package com.epam.esm.dto;
 
+import java.util.Objects;
+
 public class CertificateHasTagDto {
 
     private String certificateId;
@@ -26,5 +28,38 @@ public class CertificateHasTagDto {
 
     public void setTagId(String tagId) {
         this.tagId = tagId;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        CertificateHasTagDto that = (CertificateHasTagDto) obj;
+        return certificateId.equals(that.certificateId)
+                && tagId.equals(that.tagId);
+    }
+
+    @Override
+    public int hashCode() {
+        int prime = 31;
+        int result = 1;
+
+        result = result * prime + (certificateId != null ? certificateId.hashCode() : 0);
+        result = result * prime + (tagId != null ? tagId.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("CertificateHasTagDto { ")
+                .append("certificateId = '").append(certificateId).append('\'')
+                .append(", tagId = '").append(tagId).append('\'')
+                .append(" }\n");
+        return stringBuilder.toString();
     }
 }

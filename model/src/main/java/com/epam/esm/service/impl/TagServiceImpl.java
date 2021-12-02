@@ -23,12 +23,15 @@ public class TagServiceImpl implements TagService {
     private final TagConverter tagConverter;
     private final Validator validator;
     private final TagDao tagDao;
+    private final LocaleManager localeManager;
 
     @Autowired
-    public TagServiceImpl(TagDao tagDao, Validator validator, TagConverter tagConverter) {
+    public TagServiceImpl(TagDao tagDao, Validator validator,
+                          TagConverter tagConverter, LocaleManager localeManager) {
         this.tagDao = tagDao;
         this.validator = validator;
         this.tagConverter = tagConverter;
+        this.localeManager = localeManager;
     }
 
     @Override
@@ -49,11 +52,11 @@ public class TagServiceImpl implements TagService {
                 return tagConverter.convertTagToTegDto(result.get());
             } else {
                 throw new ServiceSearchException(
-                        LocaleManager.getLocalizedMessage(LanguagePath.TAG_ERROR_NOT_FOUND));
+                        localeManager.getLocalizedMessage(LanguagePath.TAG_ERROR_NOT_FOUND));
             }
         } else {
             throw new ServiceValidationException(
-                    LocaleManager.getLocalizedMessage(LanguagePath.TAG_ERROR_VALIDATION));
+                    localeManager.getLocalizedMessage(LanguagePath.TAG_ERROR_VALIDATION));
         }
     }
 
@@ -66,11 +69,11 @@ public class TagServiceImpl implements TagService {
                 return tagConverter.convertTagToTegDto(result.get());
             } else {
                 throw new ServiceSearchException(
-                        LocaleManager.getLocalizedMessage(LanguagePath.TAG_ERROR_NOT_FOUND));
+                        localeManager.getLocalizedMessage(LanguagePath.TAG_ERROR_NOT_FOUND));
             }
         } else {
             throw new ServiceValidationException(
-                    LocaleManager.getLocalizedMessage(LanguagePath.TAG_ERROR_VALIDATION));
+                    localeManager.getLocalizedMessage(LanguagePath.TAG_ERROR_VALIDATION));
         }
     }
 

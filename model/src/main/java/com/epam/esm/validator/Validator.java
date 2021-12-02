@@ -9,8 +9,8 @@ import java.math.BigDecimal;
 @Component
 public class Validator {
     private static final String ID_REGEX = "\\d+";
-    private static final String NAME_REGEX = "[\\w \\!\\?\\,\\.]{0,44}";
-    private final static String DESCRIPTION_REGEX = "[\\w ,.!?\\-\\d]{0,999}";
+    private static final String NAME_REGEX = "[\\w \\!\\?\\,\\.]{0,45}";
+    private final static String DESCRIPTION_REGEX = "[\\w ,.!?\\-\\d]{0,1000}";
 
     public boolean validateId(String id) {
         boolean result = false;
@@ -35,7 +35,7 @@ public class Validator {
 
     public boolean validateName(String name) {
         boolean result = false;
-        if(name != null && !name.isEmpty()) {
+        if(name != null && !name.isBlank()) {
             result = name.matches(NAME_REGEX);
         }
         return result;
@@ -43,7 +43,7 @@ public class Validator {
 
     public boolean validateDescription(String description) {
         boolean result = false;
-        if (description != null && !description.isEmpty()) {
+        if (description != null && !description.isBlank()) {
             result = description.matches(DESCRIPTION_REGEX);
         } else if (description == null) {
             result = true;

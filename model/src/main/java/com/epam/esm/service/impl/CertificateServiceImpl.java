@@ -30,12 +30,15 @@ public class CertificateServiceImpl implements CertificateService {
     private final Validator validator;
     private final CertificateDao certificateDao;
     private final TagDao tagDao;
+    private final LocaleManager localeManager;
 
     @Autowired
-    public CertificateServiceImpl(CertificateDao certificateDao, TagDao tagDao, Validator validator) {
+    public CertificateServiceImpl(CertificateDao certificateDao, TagDao tagDao,
+                                  Validator validator, LocaleManager localeManager) {
         this.certificateDao = certificateDao;
         this.tagDao = tagDao;
         this.validator = validator;
+        this.localeManager = localeManager;
     }
 
     @Override
@@ -60,11 +63,11 @@ public class CertificateServiceImpl implements CertificateService {
                 return certificateDto;
             } else {
                 throw new ServiceSearchException(
-                        LocaleManager.getLocalizedMessage(LanguagePath.CERTIFICATE_ERROR_NOT_FOUND));
+                        localeManager.getLocalizedMessage(LanguagePath.CERTIFICATE_ERROR_NOT_FOUND));
             }
         } else {
             throw new ServiceValidationException(
-                    LocaleManager.getLocalizedMessage(LanguagePath.CERTIFICATE_ERROR_VALIDATION));
+                    localeManager.getLocalizedMessage(LanguagePath.CERTIFICATE_ERROR_VALIDATION));
         }
     }
 
@@ -112,8 +115,11 @@ public class CertificateServiceImpl implements CertificateService {
         if (validator.validateId(certificateId) && validator.validateId(tagId)) {
             Long localCertificateId = Long.parseLong(certificateId);
             Long localTagId = Long.parseLong(tagId);
-            resultCountOfUpdate =
-                    certificateDao.updateAddTagToCertificate(localCertificateId, localTagId);
+            if (certificateDao.findById(localCertificateId).isPresent()
+                    && tagDao.findById(localTagId).isPresent()) {
+                resultCountOfUpdate =
+                        certificateDao.updateAddTagToCertificate(localCertificateId, localTagId);
+            }
         }
         return resultCountOfUpdate;
     }

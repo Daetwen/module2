@@ -1,5 +1,7 @@
 package com.epam.esm.dto;
 
+import com.epam.esm.entity.Tag;
+
 public class TagDto {
 
     private Long id;
@@ -31,5 +33,38 @@ public class TagDto {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        TagDto tag = (TagDto) obj;
+        return id.equals(tag.id)
+                && name.equals(tag.name);
+    }
+
+    @Override
+    public int hashCode() {
+        int prime = 31;
+        int result = 1;
+
+        result = result * prime + (id != null ? id.hashCode() : 0);
+        result = result * prime + (name != null ? name.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Tag{ ")
+                .append("id = '").append(id).append('\'')
+                .append(", name = '").append(name).append('\'')
+                .append(" }\n");
+        return stringBuilder.toString();
     }
 }
