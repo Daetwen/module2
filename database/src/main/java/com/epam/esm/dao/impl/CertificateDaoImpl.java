@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,10 +16,10 @@ public class CertificateDaoImpl implements CertificateDao {
 
     private static final String CREATE_CERTIFICATE = "INSERT INTO gift_certificates " +
             "(name, description, price, duration, create_date, last_update_date) VALUES(?,?,?,?,?,?)";
-    private static final String FIND_BY_ID = "SELECT " +
+    private static final String FIND_CERTIFICATE_BY_ID = "SELECT " +
             "id, name, description, price, duration, create_date, last_update_date " +
             "FROM gift_certificates WHERE id=?";
-    private static final String FIND_ALL = "SELECT " +
+    private static final String FIND_ALL_CERTIFICATES = "SELECT " +
             "id, name, description, price, duration, create_date, last_update_date " +
             "FROM gift_certificates";
     private static final String UPDATE_CERTIFICATE = "UPDATE gift_certificates SET " +
@@ -46,8 +46,8 @@ public class CertificateDaoImpl implements CertificateDao {
 
     @Override
     public int create(Certificate certificate) {
-        certificate.setCreateDate(LocalDateTime.now());
-        certificate.setLastUpdateDate(LocalDateTime.now());
+        certificate.setCreateDate(OffsetDateTime.now());
+        certificate.setLastUpdateDate(OffsetDateTime.now());
         return jdbcTemplate.update(CREATE_CERTIFICATE,
                 certificate.getName(),
                 certificate.getDescription(),
@@ -59,12 +59,12 @@ public class CertificateDaoImpl implements CertificateDao {
 
     @Override
     public Optional<Certificate> findById(Long id) {
-        return jdbcTemplate.query(FIND_BY_ID, rowMapper, id).stream().findAny();
+        return jdbcTemplate.query(FIND_CERTIFICATE_BY_ID, rowMapper, id).stream().findAny();
     }
 
     @Override
     public List<Certificate> findAll() {
-        return jdbcTemplate.query(FIND_ALL, rowMapper);
+        return jdbcTemplate.query(FIND_ALL_CERTIFICATES, rowMapper);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class CertificateDaoImpl implements CertificateDao {
 
     @Override
     public int update(Certificate certificate) {
-        certificate.setLastUpdateDate(LocalDateTime.now());
+        certificate.setLastUpdateDate(OffsetDateTime.now());
         return jdbcTemplate.update(UPDATE_CERTIFICATE,
                 certificate.getName(),
                 certificate.getDescription(),

@@ -18,7 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -55,8 +55,8 @@ public class CertificateServiceImplTest {
         certificateDtoBuilder.setDescription("Description");
         certificateDtoBuilder.setPrice(new BigDecimal(5000));
         certificateDtoBuilder.setDuration(100);
-        certificateDtoBuilder.setCreateDate(LocalDateTime.parse("2021-11-20T21:30:19"));
-        certificateDtoBuilder.setLastUpdateDate(LocalDateTime.parse("2021-11-22T21:25:37"));
+        certificateDtoBuilder.setCreateDate(OffsetDateTime.parse("2021-11-20T21:30:19+03:00."));
+        certificateDtoBuilder.setLastUpdateDate(OffsetDateTime.parse("2021-11-22T21:25:37+03:00."));
         certificateDtoTest1 = certificateDtoBuilder.build();
         certificateDtoTest1.setTags(tagDtoList);
 
@@ -66,8 +66,8 @@ public class CertificateServiceImplTest {
         certificateBuilder.setDescription("Description");
         certificateBuilder.setPrice(new BigDecimal(5000));
         certificateBuilder.setDuration(100);
-        certificateBuilder.setCreateDate(LocalDateTime.parse("2021-11-20T21:30:19"));
-        certificateBuilder.setLastUpdateDate(LocalDateTime.parse("2021-11-22T21:25:37"));
+        certificateBuilder.setCreateDate(OffsetDateTime.parse("2021-11-20T21:30:19+03:00."));
+        certificateBuilder.setLastUpdateDate(OffsetDateTime.parse("2021-11-22T21:25:37+03:00."));
         certificateTest1 = certificateBuilder.build();
         certificateTest1.setTags(tagList);
 

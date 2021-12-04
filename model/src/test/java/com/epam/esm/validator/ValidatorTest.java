@@ -117,6 +117,12 @@ public class ValidatorTest {
     }
 
     @Test
+    public void validateDescriptionTestTrue3() {
+        boolean actual = validator.validateDescription(null);
+        assertTrue(actual);
+    }
+
+    @Test
     public void validateDescriptionTestFalse1() {
         String description= "";
         boolean actual = validator.validateDescription(description);

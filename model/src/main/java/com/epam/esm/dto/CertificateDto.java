@@ -1,10 +1,7 @@
 package com.epam.esm.dto;
 
-import com.epam.esm.entity.Certificate;
-import com.epam.esm.entity.Tag;
-
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -15,8 +12,8 @@ public class CertificateDto {
     private String description;
     private BigDecimal price;
     private int duration;
-    private LocalDateTime createDate;
-    private LocalDateTime lastUpdateDate;
+    private OffsetDateTime createDate;
+    private OffsetDateTime lastUpdateDate;
     private List<TagDto> tags;
 
     public CertificateDto() {}
@@ -26,8 +23,8 @@ public class CertificateDto {
                        String description,
                        BigDecimal price,
                        int duration,
-                       LocalDateTime createDate,
-                       LocalDateTime lastUpdateDate,
+                       OffsetDateTime createDate,
+                       OffsetDateTime lastUpdateDate,
                        List<TagDto> tags) {
         this.id = id;
         this.name = name;
@@ -85,19 +82,19 @@ public class CertificateDto {
         this.duration = duration;
     }
 
-    public LocalDateTime getCreateDate() {
+    public OffsetDateTime getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(LocalDateTime createDate) {
+    public void setCreateDate(OffsetDateTime createDate) {
         this.createDate = createDate;
     }
 
-    public LocalDateTime getLastUpdateDate() {
+    public OffsetDateTime getLastUpdateDate() {
         return lastUpdateDate;
     }
 
-    public void setLastUpdateDate(LocalDateTime lastUpdateDate) {
+    public void setLastUpdateDate(OffsetDateTime lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
     }
 

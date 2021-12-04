@@ -4,7 +4,7 @@ import com.epam.esm.dto.CertificateDto;
 import com.epam.esm.dto.TagDto;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,8 +15,8 @@ public class CertificateDtoBuilder {
     private String description;
     private BigDecimal price;
     private int duration;
-    private LocalDateTime createDate;
-    private LocalDateTime lastUpdateDate;
+    private OffsetDateTime createDate;
+    private OffsetDateTime lastUpdateDate;
     private List<TagDto> tags;
 
     public CertificateDto build() {
@@ -52,11 +52,11 @@ public class CertificateDtoBuilder {
         this.duration = duration;
     }
 
-    public void setCreateDate(LocalDateTime createDate) {
+    public void setCreateDate(OffsetDateTime createDate) {
         this.createDate = createDate;
     }
 
-    public void setLastUpdateDate(LocalDateTime lastUpdateDate) {
+    public void setLastUpdateDate(OffsetDateTime lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
     }
 

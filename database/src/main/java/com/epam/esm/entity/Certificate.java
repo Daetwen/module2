@@ -1,7 +1,7 @@
 package com.epam.esm.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,8 +14,8 @@ public class Certificate {
     private String description;
     private BigDecimal price;
     private int duration;
-    private LocalDateTime createDate;
-    private LocalDateTime lastUpdateDate;
+    private OffsetDateTime createDate;
+    private OffsetDateTime lastUpdateDate;
     private List<Tag> tags;
 
     public Certificate() {}
@@ -25,8 +25,8 @@ public class Certificate {
                        String description,
                        BigDecimal price,
                        int duration,
-                       LocalDateTime createDate,
-                       LocalDateTime lastUpdateDate,
+                       OffsetDateTime createDate,
+                       OffsetDateTime lastUpdateDate,
                        List<Tag> tags) {
         this.id = id;
         this.name = name;
@@ -81,19 +81,19 @@ public class Certificate {
         this.duration = duration;
     }
 
-    public LocalDateTime getCreateDate() {
+    public OffsetDateTime getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(LocalDateTime createDate) {
+    public void setCreateDate(OffsetDateTime createDate) {
         this.createDate = createDate;
     }
 
-    public LocalDateTime getLastUpdateDate() {
+    public OffsetDateTime getLastUpdateDate() {
         return lastUpdateDate;
     }
 
-    public void setLastUpdateDate(LocalDateTime lastUpdateDate) {
+    public void setLastUpdateDate(OffsetDateTime lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
     }
 

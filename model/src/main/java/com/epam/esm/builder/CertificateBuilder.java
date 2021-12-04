@@ -4,7 +4,7 @@ import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,8 +14,8 @@ public class CertificateBuilder {
     private String description;
     private BigDecimal price;
     private int duration;
-    private LocalDateTime createDate;
-    private LocalDateTime lastUpdateDate;
+    private OffsetDateTime createDate;
+    private OffsetDateTime lastUpdateDate;
     private List<Tag> tags;
 
     public Certificate build() {
@@ -50,11 +50,11 @@ public class CertificateBuilder {
         this.duration = duration;
     }
 
-    public void setCreateDate(LocalDateTime createDate) {
+    public void setCreateDate(OffsetDateTime createDate) {
         this.createDate = createDate;
     }
 
-    public void setLastUpdateDate(LocalDateTime lastUpdateDate) {
+    public void setLastUpdateDate(OffsetDateTime lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
     }
 

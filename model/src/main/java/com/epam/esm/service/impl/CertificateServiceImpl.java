@@ -83,11 +83,9 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public List<CertificateDto> findByParameters(Map<String, String> parameters) {
         StringBuilder resultRequest;
+        resultRequest = createRequest(parameters);
         if (parameters.containsKey(FindParameter.SORT)) {
-            resultRequest = createRequest(parameters);
             resultRequest.append(FindRequest.SORT_BY_NAME).append(parameters.get(FindParameter.SORT));
-        } else {
-            resultRequest = createRequest(parameters);
         }
         Object[] arguments = createArguments(parameters);
         List<Certificate> certificateList =
@@ -128,8 +126,7 @@ public class CertificateServiceImpl implements CertificateService {
     public int deleteById(String id) {
         int resultCountOfDeletes = 0;
         if (validator.validateId(id)) {
-            Long localId = Long.parseLong(id);
-            resultCountOfDeletes = certificateDao.deleteById(localId);
+            resultCountOfDeletes = certificateDao.deleteById(Long.parseLong(id));
         }
         return resultCountOfDeletes;
     }
@@ -151,31 +148,53 @@ public class CertificateServiceImpl implements CertificateService {
     private StringBuilder createRequest(Map<String, String> parameters) {
         String union = "UNION ";
         StringBuilder result = new StringBuilder();
+        createTagNameRequest(parameters, result);
+        createNameOrDescriptionRequest(parameters, result, union);
+        return result;
+    }
+
+    private void createTagNameRequest(Map<String, String> parameters, StringBuilder result) {
         if (parameters.containsKey(FindParameter.TAG_NAME)) {
             result.append(FindRequest.FIND_CERTIFICATE_BY_TAG_NAME);
         }
+    }
+
+    private void createNameOrDescriptionRequest(Map<String, String> parameters,
+                                                StringBuilder result,
+                                                String mergeOperation) {
         if (parameters.containsKey(FindParameter.NAME_OR_DESC_PART)) {
             if (result.length() == 0) {
                 result.append(FindRequest.FIND_CERTIFICATE_BY_PART_OF_NAME_OR_DESCRIPTION);
             } else {
-                result.append(union)
+                result.append(mergeOperation)
                         .append(FindRequest.FIND_CERTIFICATE_BY_PART_OF_NAME_OR_DESCRIPTION);
             }
         }
-        return result;
     }
 
     private Object[] createArguments(Map<String, String> parameters) {
         List<Object> arguments = new ArrayList<>();
+        createTagNameArgument(parameters, arguments);
+        createNameOrDescriptionArgument(parameters, arguments);
+        return createFinalArgumentsForSearch(arguments);
+    }
+
+    private void createTagNameArgument(Map<String, String> parameters, List<Object> arguments) {
         if (parameters.containsKey(FindParameter.TAG_NAME)) {
             arguments.add(parameters.get(FindParameter.TAG_NAME));
         }
+    }
+
+    private void createNameOrDescriptionArgument(Map<String, String> parameters, List<Object> arguments) {
         if (parameters.containsKey(FindParameter.NAME_OR_DESC_PART)) {
             parameters.computeIfPresent(FindParameter.NAME_OR_DESC_PART,
                     (key, value) -> value = "%" + value + "%");
             arguments.add(parameters.get(FindParameter.NAME_OR_DESC_PART));
             arguments.add(parameters.get(FindParameter.NAME_OR_DESC_PART));
         }
+    }
+
+    private Object[] createFinalArgumentsForSearch(List<Object> arguments) {
         Object[] argumentsResult = new Object[arguments.size()];
         for (int i = 0; i < arguments.size(); i++) {
             argumentsResult[i] = arguments.get(i);

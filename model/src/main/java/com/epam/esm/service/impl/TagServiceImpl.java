@@ -48,12 +48,7 @@ public class TagServiceImpl implements TagService {
         if (validator.validateId(id)) {
             Long localId = Long.parseLong(id);
             Optional<Tag> result = tagDao.findById(localId);
-            if (result.isPresent()) {
-                return tagConverter.convertTagToTegDto(result.get());
-            } else {
-                throw new ServiceSearchException(
-                        localeManager.getLocalizedMessage(LanguagePath.TAG_ERROR_NOT_FOUND));
-            }
+            return checkTag(result);
         } else {
             throw new ServiceValidationException(
                     localeManager.getLocalizedMessage(LanguagePath.TAG_ERROR_VALIDATION));
@@ -62,15 +57,9 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public TagDto findByName(String name) throws ServiceSearchException, ServiceValidationException {
-        boolean validation = validator.validateName(name);
-        if (validation) {
+        if (validator.validateName(name)) {
             Optional<Tag> result = tagDao.findByName(name);
-            if (result.isPresent()) {
-                return tagConverter.convertTagToTegDto(result.get());
-            } else {
-                throw new ServiceSearchException(
-                        localeManager.getLocalizedMessage(LanguagePath.TAG_ERROR_NOT_FOUND));
-            }
+            return checkTag(result);
         } else {
             throw new ServiceValidationException(
                     localeManager.getLocalizedMessage(LanguagePath.TAG_ERROR_VALIDATION));
@@ -94,5 +83,14 @@ public class TagServiceImpl implements TagService {
             resultCountOfDeletes = tagDao.deleteById(localId);
         }
         return resultCountOfDeletes;
+    }
+
+    private TagDto checkTag(Optional<Tag> tag) throws ServiceSearchException {
+        if (tag.isPresent()) {
+            return tagConverter.convertTagToTegDto(tag.get());
+        } else {
+            throw new ServiceSearchException(
+                    localeManager.getLocalizedMessage(LanguagePath.TAG_ERROR_NOT_FOUND));
+        }
     }
 }
