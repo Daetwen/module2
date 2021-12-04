@@ -8,7 +8,7 @@ import com.epam.esm.exception.ServiceValidationException;
 import com.epam.esm.service.TagService;
 import com.epam.esm.util.LocaleManager;
 import com.epam.esm.util.TagConverter;
-import com.epam.esm.validator.Validator;
+import com.epam.esm.verifier.Verifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 public class TagServiceImplTest {
 
     private TagService tagService;
-    private Validator validator;
+    private Verifier validator;
     private TagConverter tagConverter;
     private TagDao tagDao;
     private TagDto tagDtoTest1;
@@ -33,7 +33,7 @@ public class TagServiceImplTest {
     @BeforeEach
     public void setUp() {
         tagDao = mock(TagDao.class);
-        validator = mock(Validator.class);
+        validator = mock(Verifier.class);
         tagConverter = mock(TagConverter.class);
         LocaleManager localeManager = mock(LocaleManager.class);
         tagService = new TagServiceImpl(tagDao, validator, tagConverter, localeManager);
@@ -44,7 +44,7 @@ public class TagServiceImplTest {
     @Test
     public void createTestTrue() {
         int expected = 1;
-        when(validator.validateTag(any(TagDto.class))).thenReturn(true);
+        when(validator.isValidTag(any(TagDto.class))).thenReturn(true);
         when(tagConverter.convertTagDtoToTag(any(TagDto.class))).thenReturn(tagTest1);
         when(tagDao.create(any(Tag.class))).thenReturn(1);
         int actual = tagService.create(tagDtoTest1);
@@ -54,7 +54,7 @@ public class TagServiceImplTest {
     @Test
     public void createTestFalse1() {
         int expected = 0;
-        when(validator.validateTag(any(TagDto.class))).thenReturn(false);
+        when(validator.isValidTag(any(TagDto.class))).thenReturn(false);
         when(tagConverter.convertTagDtoToTag(any(TagDto.class))).thenReturn(tagTest1);
         when(tagDao.create(any(Tag.class))).thenReturn(1);
         int actual = tagService.create(tagDtoTest1);
@@ -64,7 +64,7 @@ public class TagServiceImplTest {
     @Test
     public void createTestFalse2() {
         int expected = 0;
-        when(validator.validateTag(any(TagDto.class))).thenReturn(true);
+        when(validator.isValidTag(any(TagDto.class))).thenReturn(true);
         when(tagConverter.convertTagDtoToTag(any(TagDto.class))).thenReturn(tagTest1);
         when(tagDao.create(any(Tag.class))).thenReturn(0);
         int actual = tagService.create(tagDtoTest1);
@@ -74,7 +74,7 @@ public class TagServiceImplTest {
     @Test
     public void findByIdTestTrue() throws ServiceSearchException, ServiceValidationException {
         Optional<Tag> localTag = Optional.ofNullable(tagTest1);
-        when(validator.validateId(anyString())).thenReturn(true);
+        when(validator.isValidId(anyString())).thenReturn(true);
         when(tagDao.findById(anyLong())).thenReturn(localTag);
         when(tagConverter.convertTagToTegDto(any(Tag.class))).thenReturn(tagDtoTest1);
         TagDto actual = tagService.findById("5");
@@ -83,14 +83,14 @@ public class TagServiceImplTest {
 
     @Test
     public void findByIdTestFalse1() {
-        when(validator.validateId(anyString())).thenReturn(false);
+        when(validator.isValidId(anyString())).thenReturn(false);
         assertThrows(ServiceValidationException.class,
                 () -> tagService.findById("f5g"));
     }
 
     @Test
     public void findByIdTestFalse2() {
-        when(validator.validateId(anyString())).thenReturn(true);
+        when(validator.isValidId(anyString())).thenReturn(true);
         when(tagDao.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(ServiceSearchException.class,
                 () -> tagService.findById("5"));
@@ -99,7 +99,7 @@ public class TagServiceImplTest {
     @Test
     public void findByNameTestTrue() throws ServiceSearchException, ServiceValidationException {
         Optional<Tag> localTag = Optional.ofNullable(tagTest1);
-        when(validator.validateName(anyString())).thenReturn(true);
+        when(validator.isValidName(anyString())).thenReturn(true);
         when(tagDao.findByName(anyString())).thenReturn(localTag);
         when(tagConverter.convertTagToTegDto(any(Tag.class))).thenReturn(tagDtoTest1);
         TagDto actual = tagService.findByName("New Year");
@@ -108,14 +108,14 @@ public class TagServiceImplTest {
 
     @Test
     public void findByNameTestFalse1() {
-        when(validator.validateName(anyString())).thenReturn(false);
+        when(validator.isValidName(anyString())).thenReturn(false);
         assertThrows(ServiceValidationException.class,
                 () -> tagService.findByName("New Year"));
     }
 
     @Test
     public void findByNameTestFalse2() {
-        when(validator.validateName(anyString())).thenReturn(true);
+        when(validator.isValidName(anyString())).thenReturn(true);
         when(tagDao.findByName(anyString())).thenReturn(Optional.empty());
         assertThrows(ServiceSearchException.class,
                 () -> tagService.findByName("New Year"));
@@ -136,7 +136,7 @@ public class TagServiceImplTest {
     @Test
     public void deleteByIdTestTrue() {
         int expected = 1;
-        when(validator.validateId(anyString())).thenReturn(true);
+        when(validator.isValidId(anyString())).thenReturn(true);
         when(tagDao.deleteById(anyLong())).thenReturn(1);
         int actual = tagService.deleteById("5");
         assertEquals(expected, actual);
@@ -145,7 +145,7 @@ public class TagServiceImplTest {
     @Test
     public void deleteByIdTestFalse1() {
         int expected = 0;
-        when(validator.validateId(anyString())).thenReturn(false);
+        when(validator.isValidId(anyString())).thenReturn(false);
         when(tagDao.deleteById(anyLong())).thenReturn(1);
         int actual = tagService.deleteById("5");
         assertEquals(expected, actual);
@@ -154,7 +154,7 @@ public class TagServiceImplTest {
     @Test
     public void deleteByIdTestFalse2() {
         int expected = 0;
-        when(validator.validateId(anyString())).thenReturn(true);
+        when(validator.isValidId(anyString())).thenReturn(true);
         when(tagDao.deleteById(anyLong())).thenReturn(0);
         int actual = tagService.deleteById("5");
         assertEquals(expected, actual);

@@ -1,6 +1,6 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.constant.FindParameter;
+import com.epam.esm.constant.ParameterName;
 import com.epam.esm.dto.CertificateDto;
 import com.epam.esm.dto.CertificateHasTagDto;
 import com.epam.esm.exception.ServiceSearchException;
@@ -45,7 +45,11 @@ public class CertificateController {
             @RequestParam(value = "tagName", required = false) String tagName,
             @RequestParam(value = "part", required = false) String part,
             @RequestParam(value = "sort", required = false) String sort) {
-        return certificateService.findByParameters(collectParameters(tagName, part, sort));
+        Map<String, String> parameters = new HashMap<>();
+        collectParameters(parameters, ParameterName.TAG_NAME, tagName);
+        collectParameters(parameters, ParameterName.NAME_OR_DESC_PART, part);
+        collectParameters(parameters, ParameterName.SORT, sort);
+        return certificateService.findByParameters(parameters);
     }
 
     @RequestMapping(value="/certificate_update", method = RequestMethod.PATCH)
@@ -68,17 +72,11 @@ public class CertificateController {
         return certificateService.deleteTagFromCertificate(certificateHasTagDto);
     }
 
-    private Map<String, String> collectParameters(String tagName, String part, String sort) {
-        Map<String, String> parameters = new HashMap<>();
-        if (StringUtils.isNotBlank(tagName)) {
-            parameters.put(FindParameter.TAG_NAME, tagName);
+    private void collectParameters(Map<String, String> parameters,
+                                   ParameterName parameterName,
+                                   String parameter) {
+        if (StringUtils.isNotBlank(parameter)) {
+            parameters.put(parameterName.name(), parameter);
         }
-        if (StringUtils.isNotBlank(part)) {
-            parameters.put(FindParameter.NAME_OR_DESC_PART, part);
-        }
-        if (StringUtils.isNotBlank(sort)) {
-            parameters.put(FindParameter.SORT, sort);
-        }
-        return parameters;
     }
 }

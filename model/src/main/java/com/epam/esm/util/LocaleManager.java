@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LocaleManager {
 
-    private MessageSource messageSource;
+    private final MessageSource messageSource;
 
     @Autowired
     public LocaleManager(MessageSource messageSource) {

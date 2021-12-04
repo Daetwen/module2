@@ -9,7 +9,7 @@ import com.epam.esm.exception.ServiceValidationException;
 import com.epam.esm.service.TagService;
 import com.epam.esm.util.LocaleManager;
 import com.epam.esm.util.TagConverter;
-import com.epam.esm.validator.Validator;
+import com.epam.esm.verifier.Verifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,15 +21,15 @@ import java.util.Optional;
 public class TagServiceImpl implements TagService {
 
     private final TagConverter tagConverter;
-    private final Validator validator;
+    private final Verifier verifier;
     private final TagDao tagDao;
     private final LocaleManager localeManager;
 
     @Autowired
-    public TagServiceImpl(TagDao tagDao, Validator validator,
+    public TagServiceImpl(TagDao tagDao, Verifier verifier,
                           TagConverter tagConverter, LocaleManager localeManager) {
         this.tagDao = tagDao;
-        this.validator = validator;
+        this.verifier = verifier;
         this.tagConverter = tagConverter;
         this.localeManager = localeManager;
     }
@@ -37,7 +37,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public int create(TagDto tagDto) {
         int countOfCreation = 0;
-        if (validator.validateTag(tagDto)) {
+        if (verifier.isValidTag(tagDto)) {
             countOfCreation = tagDao.create(tagConverter.convertTagDtoToTag(tagDto));
         }
         return countOfCreation;
@@ -45,24 +45,24 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public TagDto findById(String id) throws ServiceSearchException, ServiceValidationException {
-        if (validator.validateId(id)) {
+        if (verifier.isValidId(id)) {
             Long localId = Long.parseLong(id);
             Optional<Tag> result = tagDao.findById(localId);
             return checkTag(result);
         } else {
             throw new ServiceValidationException(
-                    localeManager.getLocalizedMessage(LanguagePath.TAG_ERROR_VALIDATION));
+                    localeManager.getLocalizedMessage(LanguagePath.ERROR_VALIDATION));
         }
     }
 
     @Override
     public TagDto findByName(String name) throws ServiceSearchException, ServiceValidationException {
-        if (validator.validateName(name)) {
+        if (verifier.isValidName(name)) {
             Optional<Tag> result = tagDao.findByName(name);
             return checkTag(result);
         } else {
             throw new ServiceValidationException(
-                    localeManager.getLocalizedMessage(LanguagePath.TAG_ERROR_VALIDATION));
+                    localeManager.getLocalizedMessage(LanguagePath.ERROR_VALIDATION));
         }
     }
 
@@ -78,7 +78,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public int deleteById(String id) {
         int resultCountOfDeletes = 0;
-        if (validator.validateId(id)) {
+        if (verifier.isValidId(id)) {
             Long localId = Long.parseLong(id);
             resultCountOfDeletes = tagDao.deleteById(localId);
         }
@@ -90,7 +90,7 @@ public class TagServiceImpl implements TagService {
             return tagConverter.convertTagToTegDto(tag.get());
         } else {
             throw new ServiceSearchException(
-                    localeManager.getLocalizedMessage(LanguagePath.TAG_ERROR_NOT_FOUND));
+                    localeManager.getLocalizedMessage(LanguagePath.ERROR_NOT_FOUND));
         }
     }
 }

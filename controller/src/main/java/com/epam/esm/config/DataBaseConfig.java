@@ -24,7 +24,7 @@ public class DataBaseConfig {
     private String username;
 
     @Value("${password}")
-    private String password;
+    private CharSequence password;
 
     @Bean
     public DataSource dataSource() {
@@ -32,7 +32,7 @@ public class DataBaseConfig {
         hikariDataSource.setDriverClassName(driverClassName);
         hikariDataSource.setJdbcUrl(url);
         hikariDataSource.setUsername(username);
-        hikariDataSource.setPassword(password);
+        hikariDataSource.setPassword(password.toString());
         return hikariDataSource;
     }
 

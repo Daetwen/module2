@@ -1,6 +1,6 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.constant.FindParameter;
+import com.epam.esm.constant.ParameterName;
 import com.epam.esm.constant.FindRequest;
 import com.epam.esm.constant.LanguagePath;
 import com.epam.esm.dao.CertificateDao;
@@ -15,7 +15,7 @@ import com.epam.esm.exception.ServiceValidationException;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.util.LocaleManager;
 import com.epam.esm.util.TagConverter;
-import com.epam.esm.validator.Validator;
+import com.epam.esm.verifier.Verifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,24 +27,24 @@ import java.util.Optional;
 @Service
 public class CertificateServiceImpl implements CertificateService {
 
-    private final Validator validator;
+    private final Verifier verifier;
     private final CertificateDao certificateDao;
     private final TagDao tagDao;
     private final LocaleManager localeManager;
 
     @Autowired
     public CertificateServiceImpl(CertificateDao certificateDao, TagDao tagDao,
-                                  Validator validator, LocaleManager localeManager) {
+                                  Verifier verifier, LocaleManager localeManager) {
         this.certificateDao = certificateDao;
         this.tagDao = tagDao;
-        this.validator = validator;
+        this.verifier = verifier;
         this.localeManager = localeManager;
     }
 
     @Override
     public int create(CertificateDto certificateDto) {
         int countOfCreation = 0;
-        if (validator.validateCertificate(certificateDto)) {
+        if (verifier.isValidCertificate(certificateDto)) {
             countOfCreation = certificateDao.create(
                     CertificateService.super.convertCertificateDtoToCertificate(certificateDto));
         }
@@ -53,7 +53,7 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     public CertificateDto findById(String id) throws ServiceSearchException, ServiceValidationException {
-        if (validator.validateId(id)) {
+        if (verifier.isValidId(id)) {
             Long localId = Long.parseLong(id);
             Optional<Certificate> result = certificateDao.findById(localId);
             if (result.isPresent()) {
@@ -63,11 +63,11 @@ public class CertificateServiceImpl implements CertificateService {
                 return certificateDto;
             } else {
                 throw new ServiceSearchException(
-                        localeManager.getLocalizedMessage(LanguagePath.CERTIFICATE_ERROR_NOT_FOUND));
+                        localeManager.getLocalizedMessage(LanguagePath.ERROR_NOT_FOUND));
             }
         } else {
             throw new ServiceValidationException(
-                    localeManager.getLocalizedMessage(LanguagePath.CERTIFICATE_ERROR_VALIDATION));
+                    localeManager.getLocalizedMessage(LanguagePath.ERROR_VALIDATION));
         }
     }
 
@@ -84,9 +84,6 @@ public class CertificateServiceImpl implements CertificateService {
     public List<CertificateDto> findByParameters(Map<String, String> parameters) {
         StringBuilder resultRequest;
         resultRequest = createRequest(parameters);
-        if (parameters.containsKey(FindParameter.SORT)) {
-            resultRequest.append(FindRequest.SORT_BY_NAME).append(parameters.get(FindParameter.SORT));
-        }
         Object[] arguments = createArguments(parameters);
         List<Certificate> certificateList =
                 certificateDao.findByParameters(resultRequest.toString(), arguments);
@@ -98,7 +95,7 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public int update(CertificateDto certificateDto) {
         int resultCountOfUpdate = 0;
-        if (validator.validateCertificate(certificateDto)) {
+        if (verifier.isValidCertificate(certificateDto)) {
             resultCountOfUpdate = certificateDao.update(
                     CertificateService.super.convertCertificateDtoToCertificate(certificateDto));
         }
@@ -110,7 +107,7 @@ public class CertificateServiceImpl implements CertificateService {
         String certificateId = certificateHasTagDto.getCertificateId();
         String tagId = certificateHasTagDto.getTagId();
         int resultCountOfUpdate = 0;
-        if (validator.validateId(certificateId) && validator.validateId(tagId)) {
+        if (verifier.isValidId(certificateId) && verifier.isValidId(tagId)) {
             Long localCertificateId = Long.parseLong(certificateId);
             Long localTagId = Long.parseLong(tagId);
             if (certificateDao.findById(localCertificateId).isPresent()
@@ -125,7 +122,7 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public int deleteById(String id) {
         int resultCountOfDeletes = 0;
-        if (validator.validateId(id)) {
+        if (verifier.isValidId(id)) {
             resultCountOfDeletes = certificateDao.deleteById(Long.parseLong(id));
         }
         return resultCountOfDeletes;
@@ -136,7 +133,7 @@ public class CertificateServiceImpl implements CertificateService {
         String certificateId = certificateHasTagDto.getCertificateId();
         String tagId = certificateHasTagDto.getTagId();
         int resultCountOfDeletes = 0;
-        if (validator.validateId(certificateId) && validator.validateId(tagId)) {
+        if (verifier.isValidId(certificateId) && verifier.isValidId(tagId)) {
             Long localCertificateId = Long.parseLong(certificateId);
             Long localTagId = Long.parseLong(tagId);
             resultCountOfDeletes =
@@ -147,54 +144,63 @@ public class CertificateServiceImpl implements CertificateService {
 
     private StringBuilder createRequest(Map<String, String> parameters) {
         String union = "UNION ";
-        StringBuilder result = new StringBuilder();
-        createTagNameRequest(parameters, result);
-        createNameOrDescriptionRequest(parameters, result, union);
-        return result;
+        StringBuilder request = new StringBuilder();
+        request.append(getRequestWithTagName(parameters))
+                .append(getRequestWithNameOrDescription(parameters, request, union))
+                .append(getRequestWithSort(parameters));
+        return request;
     }
 
-    private void createTagNameRequest(Map<String, String> parameters, StringBuilder result) {
-        if (parameters.containsKey(FindParameter.TAG_NAME)) {
-            result.append(FindRequest.FIND_CERTIFICATE_BY_TAG_NAME);
-        }
+    private String getRequestWithTagName(Map<String, String> parameters) {
+        return parameters.containsKey(ParameterName.TAG_NAME.name()) ?
+                FindRequest.FIND_CERTIFICATE_BY_TAG_NAME :
+                "";
     }
 
-    private void createNameOrDescriptionRequest(Map<String, String> parameters,
-                                                StringBuilder result,
+    private String getRequestWithNameOrDescription(Map<String, String> parameters,
+                                                StringBuilder request,
                                                 String mergeOperation) {
-        if (parameters.containsKey(FindParameter.NAME_OR_DESC_PART)) {
-            if (result.length() == 0) {
-                result.append(FindRequest.FIND_CERTIFICATE_BY_PART_OF_NAME_OR_DESCRIPTION);
+        StringBuilder localRequest = new StringBuilder();
+        if (parameters.containsKey(ParameterName.NAME_OR_DESC_PART.name())) {
+            if (request.length() == 0) {
+                localRequest.append(FindRequest.FIND_CERTIFICATE_BY_PART_OF_NAME_OR_DESCRIPTION);
             } else {
-                result.append(mergeOperation)
+                localRequest.append(mergeOperation)
                         .append(FindRequest.FIND_CERTIFICATE_BY_PART_OF_NAME_OR_DESCRIPTION);
             }
         }
+        return localRequest.toString();
+    }
+
+    private String getRequestWithSort(Map<String, String> parameters) {
+        return parameters.containsKey(ParameterName.SORT.name()) ?
+                FindRequest.SORT_BY_NAME + parameters.get(ParameterName.SORT.name()) :
+                "";
     }
 
     private Object[] createArguments(Map<String, String> parameters) {
         List<Object> arguments = new ArrayList<>();
-        createTagNameArgument(parameters, arguments);
-        createNameOrDescriptionArgument(parameters, arguments);
-        return createFinalArgumentsForSearch(arguments);
+        getArgumentWithTagName(parameters, arguments);
+        getArgumentWithNameOrDescription(parameters, arguments);
+        return getFinalArgumentsForSearch(arguments);
     }
 
-    private void createTagNameArgument(Map<String, String> parameters, List<Object> arguments) {
-        if (parameters.containsKey(FindParameter.TAG_NAME)) {
-            arguments.add(parameters.get(FindParameter.TAG_NAME));
+    private void getArgumentWithTagName(Map<String, String> parameters, List<Object> arguments) {
+        if (parameters.containsKey(ParameterName.TAG_NAME.name())) {
+            arguments.add(parameters.get(ParameterName.TAG_NAME.name()));
         }
     }
 
-    private void createNameOrDescriptionArgument(Map<String, String> parameters, List<Object> arguments) {
-        if (parameters.containsKey(FindParameter.NAME_OR_DESC_PART)) {
-            parameters.computeIfPresent(FindParameter.NAME_OR_DESC_PART,
+    private void getArgumentWithNameOrDescription(Map<String, String> parameters, List<Object> arguments) {
+        if (parameters.containsKey(ParameterName.NAME_OR_DESC_PART.name())) {
+            parameters.computeIfPresent(ParameterName.NAME_OR_DESC_PART.name(),
                     (key, value) -> value = "%" + value + "%");
-            arguments.add(parameters.get(FindParameter.NAME_OR_DESC_PART));
-            arguments.add(parameters.get(FindParameter.NAME_OR_DESC_PART));
+            arguments.add(parameters.get(ParameterName.NAME_OR_DESC_PART.name()));
+            arguments.add(parameters.get(ParameterName.NAME_OR_DESC_PART.name()));
         }
     }
 
-    private Object[] createFinalArgumentsForSearch(List<Object> arguments) {
+    private Object[] getFinalArgumentsForSearch(List<Object> arguments) {
         Object[] argumentsResult = new Object[arguments.size()];
         for (int i = 0; i < arguments.size(); i++) {
             argumentsResult[i] = arguments.get(i);
