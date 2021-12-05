@@ -2,8 +2,8 @@ package com.epam.esm.entity;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -18,7 +18,9 @@ public class Certificate {
     private OffsetDateTime lastUpdateDate;
     private List<Tag> tags;
 
-    public Certificate() {}
+    public Certificate() {
+        this.tags = new ArrayList<>();
+    }
 
     public Certificate(Long id,
                        String name,
@@ -36,8 +38,11 @@ public class Certificate {
         this.createDate = createDate;
         this.lastUpdateDate = lastUpdateDate;
         this.tags = new ArrayList<>();
-        if (tags != null) {
-            Collections.copy(this.tags, tags);
+        if (tags != null && !tags.isEmpty()) {
+            for (Tag element : tags) {
+                Tag tag = new Tag(element);
+                this.tags.add(tag);
+            }
         }
     }
 
@@ -100,7 +105,10 @@ public class Certificate {
     public List<Tag> getTags() {
         List<Tag> resultTags = new ArrayList<>();
         if (this.tags != null) {
-            Collections.copy(resultTags, this.tags);
+            for (Tag value : this.tags) {
+                Tag tag = new Tag(value);
+                resultTags.add(tag);
+            }
         }
         return resultTags;
     }
@@ -108,8 +116,8 @@ public class Certificate {
     public void setTags(List<Tag> tags) {
         if (tags != null) {
             this.tags = new ArrayList<>();
-            for (Tag value : tags) {
-                Tag tag = new Tag(value);
+            for (Tag element : tags) {
+                Tag tag = new Tag(element);
                 this.tags.add(tag);
             }
         }
@@ -130,7 +138,8 @@ public class Certificate {
                 && price.equals(that.price)
                 && duration == that.duration
                 && createDate.equals(that.createDate)
-                && lastUpdateDate.equals(that.lastUpdateDate)
+                && lastUpdateDate.truncatedTo( ChronoUnit.SECONDS )
+                .equals(that.lastUpdateDate.truncatedTo( ChronoUnit.SECONDS ))
                 && tags != null ? tags.equals(that.tags) : that.tags == null;
     }
 
@@ -162,7 +171,7 @@ public class Certificate {
                 .append(", createDate = '").append(createDate).append('\'')
                 .append(", lastUpdateDate = '").append(lastUpdateDate).append('\'');
         stringBuilder.append(", tags = [");
-        for(Tag tag : tags) {
+        for(Tag tag : this.tags) {
             stringBuilder.append(tag).append(", ");
         }
         stringBuilder.append("] }\n");

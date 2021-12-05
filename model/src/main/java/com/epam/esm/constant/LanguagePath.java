@@ -7,6 +7,7 @@ public final class LanguagePath {
     public static final String PARAMETERS_SEARCH_TAG_ERROR = "parameters.error.controller.tag.search";
     public static final String CONTROLLER_METHOD_NOT_SUPPORTED = "controller.error.method-not-supported";
     public static final String CONTROLLER_NO_HANDLER ="controller.error.no-handler";
+    public static final String ERROR_UNSUPPORTED_MEDIA_TYPE = "error.unsupported-media-type";
 
     private LanguagePath() {}
 }

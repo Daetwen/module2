@@ -10,6 +10,7 @@ import com.epam.esm.util.LocaleManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -53,6 +54,13 @@ public class ExceptionAdviceController {
     public ResponseEntity<ExceptionDto> handleError(HttpRequestMethodNotSupportedException e) {
         String errorMessage = localeManager.getLocalizedMessage(LanguagePath.CONTROLLER_METHOD_NOT_SUPPORTED);
         ExceptionDto exceptionDto = new ExceptionDto(errorMessage, ErrorCode.METHOD_NOT_ALLOWED_ERROR_CODE);
+        return new ResponseEntity<>(exceptionDto, HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ExceptionDto> handleError(HttpMediaTypeNotSupportedException e) {
+        String errorMessage = localeManager.getLocalizedMessage(LanguagePath.ERROR_UNSUPPORTED_MEDIA_TYPE);
+        ExceptionDto exceptionDto = new ExceptionDto(errorMessage, ErrorCode.UNSUPPORTED_MEDIA_TYPE_ERROR_CODE);
         return new ResponseEntity<>(exceptionDto, HttpStatus.METHOD_NOT_ALLOWED);
     }
 }
