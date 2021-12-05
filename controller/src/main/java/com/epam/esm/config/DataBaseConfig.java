@@ -17,7 +17,7 @@ public class DataBaseConfig {
     @Value("${driverClassName}")
     private String driverClassName;
 
-    @Value("${dev.url}")
+    @Value("${prod.url}")
     private String url;
 
     @Value("${user}")

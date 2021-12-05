@@ -8,12 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Validator {
+public class ValidatorController {
 
     private final LocaleManager localeManager;
 
     @Autowired
-    public Validator(LocaleManager localeManager) {
+    public ValidatorController(LocaleManager localeManager) {
         this.localeManager = localeManager;
     }
 

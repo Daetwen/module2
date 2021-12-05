@@ -8,7 +8,7 @@ import com.epam.esm.exception.ServiceValidationException;
 import com.epam.esm.service.TagService;
 import com.epam.esm.util.LocaleManager;
 import com.epam.esm.util.TagConverter;
-import com.epam.esm.verifier.Verifier;
+import com.epam.esm.util.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,13 +18,12 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class TagServiceImplTest {
 
     private TagService tagService;
-    private Verifier validator;
+    private Validator validator;
     private TagConverter tagConverter;
     private TagDao tagDao;
     private TagDto tagDtoTest1;
@@ -33,7 +32,7 @@ public class TagServiceImplTest {
     @BeforeEach
     public void setUp() {
         tagDao = mock(TagDao.class);
-        validator = mock(Verifier.class);
+        validator = mock(Validator.class);
         tagConverter = mock(TagConverter.class);
         LocaleManager localeManager = mock(LocaleManager.class);
         tagService = new TagServiceImpl(tagDao, validator, tagConverter, localeManager);
@@ -74,7 +73,7 @@ public class TagServiceImplTest {
     @Test
     public void findByIdTestTrue() throws ServiceSearchException, ServiceValidationException {
         Optional<Tag> localTag = Optional.ofNullable(tagTest1);
-        when(validator.isValidId(anyString())).thenReturn(true);
+        doNothing().when(validator).validateId(anyString());
         when(tagDao.findById(anyLong())).thenReturn(localTag);
         when(tagConverter.convertTagToTegDto(any(Tag.class))).thenReturn(tagDtoTest1);
         TagDto actual = tagService.findById("5");
@@ -82,15 +81,15 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void findByIdTestFalse1() {
-        when(validator.isValidId(anyString())).thenReturn(false);
+    public void findByIdTestFalse1() throws ServiceValidationException {
+        doThrow(ServiceValidationException.class).when(validator).validateId(anyString());
         assertThrows(ServiceValidationException.class,
                 () -> tagService.findById("f5g"));
     }
 
     @Test
-    public void findByIdTestFalse2() {
-        when(validator.isValidId(anyString())).thenReturn(true);
+    public void findByIdTestFalse2() throws ServiceValidationException {
+        doNothing().when(validator).validateId(anyString());
         when(tagDao.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(ServiceSearchException.class,
                 () -> tagService.findById("5"));
@@ -99,7 +98,7 @@ public class TagServiceImplTest {
     @Test
     public void findByNameTestTrue() throws ServiceSearchException, ServiceValidationException {
         Optional<Tag> localTag = Optional.ofNullable(tagTest1);
-        when(validator.isValidName(anyString())).thenReturn(true);
+        doNothing().when(validator).validateName(anyString());
         when(tagDao.findByName(anyString())).thenReturn(localTag);
         when(tagConverter.convertTagToTegDto(any(Tag.class))).thenReturn(tagDtoTest1);
         TagDto actual = tagService.findByName("New Year");
@@ -107,15 +106,15 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void findByNameTestFalse1() {
-        when(validator.isValidName(anyString())).thenReturn(false);
+    public void findByNameTestFalse1() throws ServiceValidationException {
+        doThrow(ServiceValidationException.class).when(validator).validateName(anyString());
         assertThrows(ServiceValidationException.class,
                 () -> tagService.findByName("New Year"));
     }
 
     @Test
-    public void findByNameTestFalse2() {
-        when(validator.isValidName(anyString())).thenReturn(true);
+    public void findByNameTestFalse2() throws ServiceValidationException {
+        doNothing().when(validator).validateName(anyString());
         when(tagDao.findByName(anyString())).thenReturn(Optional.empty());
         assertThrows(ServiceSearchException.class,
                 () -> tagService.findByName("New Year"));

@@ -26,7 +26,7 @@ public class CertificateDaoImpl implements CertificateDao {
             "name=COALESCE(?, name), " +
             "description=COALESCE(?, description), " +
             "price=COALESCE(?, price), " +
-            "duration=COALESCE(?, duration) " +
+            "duration=COALESCE(?, duration), " +
             "last_update_date=? " +
             "WHERE id=?";
     private static final String UPDATE_ADD_TAG_TO_CERTIFICATE =

@@ -15,7 +15,7 @@ import com.epam.esm.exception.ServiceValidationException;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.util.LocaleManager;
 import com.epam.esm.util.TagConverter;
-import com.epam.esm.verifier.Verifier;
+import com.epam.esm.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,24 +27,24 @@ import java.util.Optional;
 @Service
 public class CertificateServiceImpl implements CertificateService {
 
-    private final Verifier verifier;
+    private final Validator validator;
     private final CertificateDao certificateDao;
     private final TagDao tagDao;
     private final LocaleManager localeManager;
 
     @Autowired
     public CertificateServiceImpl(CertificateDao certificateDao, TagDao tagDao,
-                                  Verifier verifier, LocaleManager localeManager) {
+                                  Validator validator, LocaleManager localeManager) {
         this.certificateDao = certificateDao;
         this.tagDao = tagDao;
-        this.verifier = verifier;
+        this.validator = validator;
         this.localeManager = localeManager;
     }
 
     @Override
     public int create(CertificateDto certificateDto) {
         int countOfCreation = 0;
-        if (verifier.isValidCertificate(certificateDto)) {
+        if (validator.isValidCertificate(certificateDto)) {
             countOfCreation = certificateDao.create(
                     CertificateService.super.convertCertificateDtoToCertificate(certificateDto));
         }
@@ -53,22 +53,9 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     public CertificateDto findById(String id) throws ServiceSearchException, ServiceValidationException {
-        if (verifier.isValidId(id)) {
-            Long localId = Long.parseLong(id);
-            Optional<Certificate> result = certificateDao.findById(localId);
-            if (result.isPresent()) {
-                CertificateDto certificateDto =
-                        CertificateService.super.convertCertificateToCertificateDto(result.get());
-                appendTagsForOne(certificateDto);
-                return certificateDto;
-            } else {
-                throw new ServiceSearchException(
-                        localeManager.getLocalizedMessage(LanguagePath.ERROR_NOT_FOUND));
-            }
-        } else {
-            throw new ServiceValidationException(
-                    localeManager.getLocalizedMessage(LanguagePath.ERROR_VALIDATION));
-        }
+        validator.validateId(id);
+        Optional<Certificate> result = certificateDao.findById(Long.parseLong(id));
+        return checkCertificate(result);
     }
 
     @Override
@@ -95,7 +82,7 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public int update(CertificateDto certificateDto) {
         int resultCountOfUpdate = 0;
-        if (verifier.isValidCertificate(certificateDto)) {
+        if (validator.isValidCertificate(certificateDto)) {
             resultCountOfUpdate = certificateDao.update(
                     CertificateService.super.convertCertificateDtoToCertificate(certificateDto));
         }
@@ -107,7 +94,7 @@ public class CertificateServiceImpl implements CertificateService {
         String certificateId = certificateHasTagDto.getCertificateId();
         String tagId = certificateHasTagDto.getTagId();
         int resultCountOfUpdate = 0;
-        if (verifier.isValidId(certificateId) && verifier.isValidId(tagId)) {
+        if (validator.isValidId(certificateId) && validator.isValidId(tagId)) {
             Long localCertificateId = Long.parseLong(certificateId);
             Long localTagId = Long.parseLong(tagId);
             if (certificateDao.findById(localCertificateId).isPresent()
@@ -121,11 +108,7 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     public int deleteById(String id) {
-        int resultCountOfDeletes = 0;
-        if (verifier.isValidId(id)) {
-            resultCountOfDeletes = certificateDao.deleteById(Long.parseLong(id));
-        }
-        return resultCountOfDeletes;
+        return validator.isValidId(id) ? certificateDao.deleteById(Long.parseLong(id)) : 0;
     }
 
     @Override
@@ -133,7 +116,7 @@ public class CertificateServiceImpl implements CertificateService {
         String certificateId = certificateHasTagDto.getCertificateId();
         String tagId = certificateHasTagDto.getTagId();
         int resultCountOfDeletes = 0;
-        if (verifier.isValidId(certificateId) && verifier.isValidId(tagId)) {
+        if (validator.isValidId(certificateId) && validator.isValidId(tagId)) {
             Long localCertificateId = Long.parseLong(certificateId);
             Long localTagId = Long.parseLong(tagId);
             resultCountOfDeletes =
@@ -231,5 +214,18 @@ public class CertificateServiceImpl implements CertificateService {
             certificateDtoList.add(CertificateService.super.convertCertificateToCertificateDto(element));
         }
         return certificateDtoList;
+    }
+
+    private CertificateDto checkCertificate(Optional<Certificate> certificate)
+            throws ServiceSearchException {
+        if (certificate.isPresent()) {
+            CertificateDto certificateDto =
+                    CertificateService.super.convertCertificateToCertificateDto(certificate.get());
+            appendTagsForOne(certificateDto);
+            return certificateDto;
+        } else {
+            throw new ServiceSearchException(
+                    localeManager.getLocalizedMessage(LanguagePath.ERROR_NOT_FOUND));
+        }
     }
 }

@@ -13,7 +13,7 @@ import com.epam.esm.exception.ServiceSearchException;
 import com.epam.esm.exception.ServiceValidationException;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.util.LocaleManager;
-import com.epam.esm.verifier.Verifier;
+import com.epam.esm.util.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,13 +24,12 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class CertificateServiceImplTest {
 
     private CertificateService certificateService;
-    private Verifier verifier;
+    private Validator validator;
     private CertificateDao certificateDao;
     private TagDao tagDao;
     private CertificateDto certificateDtoTest1;
@@ -40,11 +39,11 @@ public class CertificateServiceImplTest {
 
     @BeforeEach
     public void setUp() {
-        verifier = mock(Verifier.class);
+        validator = mock(Validator.class);
         LocaleManager localeManager = mock(LocaleManager.class);
         certificateDao = mock(CertificateDao.class);
         tagDao = mock(TagDao.class);
-        certificateService = new CertificateServiceImpl(certificateDao, tagDao, verifier, localeManager);
+        certificateService = new CertificateServiceImpl(certificateDao, tagDao, validator, localeManager);
         List<TagDto> tagDtoList = new ArrayList<>();
         List<Tag> tagList = new ArrayList<>();
         tagTest1 = new Tag(5L, "New Year");
@@ -77,7 +76,7 @@ public class CertificateServiceImplTest {
     @Test
     public void createTestTrue() {
         int expected = 1;
-        when(verifier.isValidCertificate(any(CertificateDto.class))).thenReturn(true);
+        when(validator.isValidCertificate(any(CertificateDto.class))).thenReturn(true);
         when(certificateDao.create(any(Certificate.class))).thenReturn(1);
         int actual = certificateService.create(certificateDtoTest1);
         assertEquals(expected, actual);
@@ -86,7 +85,7 @@ public class CertificateServiceImplTest {
     @Test
     public void createTestFalse1() {
         int expected = 0;
-        when(verifier.isValidCertificate(any(CertificateDto.class))).thenReturn(false);
+        when(validator.isValidCertificate(any(CertificateDto.class))).thenReturn(false);
         int actual = certificateService.create(certificateDtoTest1);
         assertEquals(expected, actual);
     }
@@ -94,7 +93,7 @@ public class CertificateServiceImplTest {
     @Test
     public void createTestFalse2() {
         int expected = 0;
-        when(verifier.isValidCertificate(any(CertificateDto.class))).thenReturn(true);
+        when(validator.isValidCertificate(any(CertificateDto.class))).thenReturn(true);
         when(certificateDao.create(any(Certificate.class))).thenReturn(0);
         int actual = certificateService.create(certificateDtoTest1);
         assertEquals(expected, actual);
@@ -104,22 +103,22 @@ public class CertificateServiceImplTest {
     public void findByIdTestTrue() throws ServiceSearchException, ServiceValidationException {
         CertificateDto expected = certificateDtoTest1;
         Optional<Certificate> localCertificate = Optional.ofNullable(certificateTest1);
-        when(verifier.isValidId(anyString())).thenReturn(true);
+        doNothing().when(validator).validateId(anyString());
         when(certificateDao.findById(anyLong())).thenReturn(localCertificate);
         CertificateDto actual = certificateService.findById("5");
         assertEquals(expected, actual);
     }
 
     @Test
-    public void findByIdTestFalse1() {
-        when(verifier.isValidId(anyString())).thenReturn(false);
+    public void findByIdTestFalse1() throws ServiceValidationException {
+        doThrow(ServiceValidationException.class).when(validator).validateId(anyString());
         assertThrows(ServiceValidationException.class,
                 () -> certificateService.findById("f5g"));
     }
 
     @Test
-    public void findByIdTestFalse2() {
-        when(verifier.isValidId(anyString())).thenReturn(true);
+    public void findByIdTestFalse2() throws ServiceValidationException {
+        doNothing().when(validator).validateId(anyString());
         when(certificateDao.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(ServiceSearchException.class,
                 () -> certificateService.findById("5"));
@@ -139,7 +138,7 @@ public class CertificateServiceImplTest {
     @Test
     public void updateTestTrue() {
         int expected = 1;
-        when(verifier.isValidCertificate(any(CertificateDto.class))).thenReturn(true);
+        when(validator.isValidCertificate(any(CertificateDto.class))).thenReturn(true);
         when(certificateDao.update(any(Certificate.class))).thenReturn(1);
         int actual = certificateService.update(certificateDtoTest1);
         assertEquals(expected, actual);
@@ -148,7 +147,7 @@ public class CertificateServiceImplTest {
     @Test
     public void updateTestFalse1() {
         int expected = 0;
-        when(verifier.isValidCertificate(any(CertificateDto.class))).thenReturn(false);
+        when(validator.isValidCertificate(any(CertificateDto.class))).thenReturn(false);
         int actual = certificateService.update(certificateDtoTest1);
         assertEquals(expected, actual);
     }
@@ -156,7 +155,7 @@ public class CertificateServiceImplTest {
     @Test
     public void updateTestFalse2() {
         int expected = 0;
-        when(verifier.isValidCertificate(any(CertificateDto.class))).thenReturn(true);
+        when(validator.isValidCertificate(any(CertificateDto.class))).thenReturn(true);
         when(certificateDao.update(any(Certificate.class))).thenReturn(0);
         int actual = certificateService.update(certificateDtoTest1);
         assertEquals(expected, actual);
@@ -167,7 +166,7 @@ public class CertificateServiceImplTest {
         int expected = 1;
         Optional<Certificate> certificateOptional = Optional.ofNullable(certificateTest1);
         Optional<Tag> tagOptional = Optional.ofNullable(tagTest1);
-        when(verifier.isValidId(anyString())).thenReturn(true);
+        when(validator.isValidId(anyString())).thenReturn(true);
         when(certificateDao.findById(anyLong())).thenReturn(certificateOptional);
         when(tagDao.findById(anyLong())).thenReturn(tagOptional);
         when(certificateDao.updateAddTagToCertificate(anyLong(), anyLong()))
@@ -179,7 +178,7 @@ public class CertificateServiceImplTest {
     @Test
     public void updateAddTagToCertificateTestFalse1() {
         int expected = 0;
-        when(verifier.isValidId(anyString())).thenReturn(false);
+        when(validator.isValidId(anyString())).thenReturn(false);
         int actual = certificateService.updateAddTagToCertificate(certificateHasTagDto);
         assertEquals(expected, actual);
     }
@@ -187,7 +186,7 @@ public class CertificateServiceImplTest {
     @Test
     public void updateAddTagToCertificateTestFalse2() {
         int expected = 0;
-        when(verifier.isValidId(anyString())).thenReturn(true);
+        when(validator.isValidId(anyString())).thenReturn(true);
         when(certificateDao.findById(anyLong())).thenReturn(Optional.empty());
         int actual = certificateService.updateAddTagToCertificate(certificateHasTagDto);
         assertEquals(expected, actual);
@@ -197,7 +196,7 @@ public class CertificateServiceImplTest {
     public void updateAddTagToCertificateTestFalse3() {
         int expected = 0;
         Optional<Certificate> certificateOptional = Optional.ofNullable(certificateTest1);
-        when(verifier.isValidId(anyString())).thenReturn(true);
+        when(validator.isValidId(anyString())).thenReturn(true);
         when(certificateDao.findById(anyLong())).thenReturn(certificateOptional);
         when(tagDao.findById(anyLong())).thenReturn(Optional.empty());
         int actual = certificateService.updateAddTagToCertificate(certificateHasTagDto);
@@ -207,7 +206,7 @@ public class CertificateServiceImplTest {
     @Test
     public void deleteByIdTestTrue() {
         int expected = 1;
-        when(verifier.isValidId(anyString())).thenReturn(true);
+        when(validator.isValidId(anyString())).thenReturn(true);
         when(certificateDao.deleteById(anyLong())).thenReturn(1);
         int actual = certificateService.deleteById("5");
         assertEquals(expected, actual);
@@ -216,7 +215,7 @@ public class CertificateServiceImplTest {
     @Test
     public void deleteByIdTestFalse1() {
         int expected = 0;
-        when(verifier.isValidId(anyString())).thenReturn(false);
+        when(validator.isValidId(anyString())).thenReturn(false);
         int actual = certificateService.deleteById("5");
         assertEquals(expected, actual);
     }
@@ -224,7 +223,7 @@ public class CertificateServiceImplTest {
     @Test
     public void deleteByIdTestFalse2() {
         int expected = 0;
-        when(verifier.isValidId(anyString())).thenReturn(true);
+        when(validator.isValidId(anyString())).thenReturn(true);
         when(certificateDao.deleteById(anyLong())).thenReturn(0);
         int actual = certificateService.deleteById("5");
         assertEquals(expected, actual);
@@ -233,7 +232,7 @@ public class CertificateServiceImplTest {
     @Test
     public void deleteTagFromCertificateTestTrue() {
         int expected = 1;
-        when(verifier.isValidId(anyString())).thenReturn(true);
+        when(validator.isValidId(anyString())).thenReturn(true);
         when(certificateDao.deleteTagFromCertificate(anyLong(), anyLong()))
                 .thenReturn(1);
         int actual = certificateService.deleteTagFromCertificate(certificateHasTagDto);
@@ -243,7 +242,7 @@ public class CertificateServiceImplTest {
     @Test
     public void deleteTagFromCertificateTestFalse() {
         int expected = 0;
-        when(verifier.isValidId(anyString())).thenReturn(false);
+        when(validator.isValidId(anyString())).thenReturn(false);
         int actual = certificateService.deleteTagFromCertificate(certificateHasTagDto);
         assertEquals(expected, actual);
     }

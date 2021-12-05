@@ -18,6 +18,7 @@ import java.util.List;
 public class MvcDispatcherServletInitializer
         extends AbstractAnnotationConfigDispatcherServletInitializer
         implements WebMvcConfigurer {
+
     @Override
     protected Class<?>[] getRootConfigClasses() {
         return new Class[]{DataBaseConfig.class};

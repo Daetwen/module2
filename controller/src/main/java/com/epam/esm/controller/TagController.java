@@ -5,7 +5,7 @@ import com.epam.esm.exception.ControllerException;
 import com.epam.esm.exception.ServiceSearchException;
 import com.epam.esm.exception.ServiceValidationException;
 import com.epam.esm.service.TagService;
-import com.epam.esm.validator.Validator;
+import com.epam.esm.validator.ValidatorController;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
@@ -17,12 +17,12 @@ import java.util.List;
 @RequestMapping("/tags")
 public class TagController {
     private final TagService tagService;
-    private final Validator validator;
+    private final ValidatorController validatorController;
 
     @Autowired
-    public TagController(TagService tagService, Validator validator) {
+    public TagController(TagService tagService, ValidatorController validatorController) {
         this.tagService = tagService;
-        this.validator = validator;
+        this.validatorController = validatorController;
     }
 
     @RequestMapping(value="/tag_create",method = RequestMethod.POST)
@@ -41,7 +41,7 @@ public class TagController {
                          @RequestParam(value = "name", required = false) String name)
             throws ControllerException, ServiceSearchException, ServiceValidationException {
         TagDto tagDto = new TagDto();
-        validator.validateParameters(id, name);
+        validatorController.validateParameters(id, name);
         if (StringUtils.isNotBlank(name)) {
             tagDto = tagService.findByName(name);
         }
