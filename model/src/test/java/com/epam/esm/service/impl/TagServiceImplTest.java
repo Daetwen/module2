@@ -133,27 +133,25 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void deleteByIdTestTrue() {
+    public void deleteByIdTestTrue() throws ServiceValidationException {
         int expected = 1;
-        when(validator.isValidId(anyString())).thenReturn(true);
+        doNothing().when(validator).validateId(anyString());
         when(tagDao.deleteById(anyLong())).thenReturn(1);
         int actual = tagService.deleteById("5");
         assertEquals(expected, actual);
     }
 
     @Test
-    public void deleteByIdTestFalse1() {
-        int expected = 0;
-        when(validator.isValidId(anyString())).thenReturn(false);
-        when(tagDao.deleteById(anyLong())).thenReturn(1);
-        int actual = tagService.deleteById("5");
-        assertEquals(expected, actual);
+    public void deleteByIdTestFalse1() throws ServiceValidationException {
+        doThrow(ServiceValidationException.class).when(validator).validateId(anyString());
+        assertThrows(ServiceValidationException.class,
+                () -> tagService.deleteById("5"));
     }
 
     @Test
-    public void deleteByIdTestFalse2() {
+    public void deleteByIdTestFalse2() throws ServiceValidationException {
         int expected = 0;
-        when(validator.isValidId(anyString())).thenReturn(true);
+        doNothing().when(validator).validateId(anyString());
         when(tagDao.deleteById(anyLong())).thenReturn(0);
         int actual = tagService.deleteById("5");
         assertEquals(expected, actual);

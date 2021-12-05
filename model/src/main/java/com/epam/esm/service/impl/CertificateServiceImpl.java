@@ -90,38 +90,41 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public int updateAddTagToCertificate(CertificateHasTagDto certificateHasTagDto) {
+    public int updateAddTagToCertificate(CertificateHasTagDto certificateHasTagDto)
+            throws ServiceValidationException {
         String certificateId = certificateHasTagDto.getCertificateId();
         String tagId = certificateHasTagDto.getTagId();
         int resultCountOfUpdate = 0;
-        if (validator.isValidId(certificateId) && validator.isValidId(tagId)) {
-            Long localCertificateId = Long.parseLong(certificateId);
-            Long localTagId = Long.parseLong(tagId);
-            if (certificateDao.findById(localCertificateId).isPresent()
-                    && tagDao.findById(localTagId).isPresent()) {
-                resultCountOfUpdate =
-                        certificateDao.updateAddTagToCertificate(localCertificateId, localTagId);
-            }
+        validator.validateId(certificateId);
+        validator.validateId(tagId);
+        Long localCertificateId = Long.parseLong(certificateId);
+        Long localTagId = Long.parseLong(tagId);
+        if (certificateDao.findById(localCertificateId).isPresent()
+                && tagDao.findById(localTagId).isPresent()) {
+            resultCountOfUpdate =
+                    certificateDao.updateAddTagToCertificate(localCertificateId, localTagId);
         }
         return resultCountOfUpdate;
     }
 
     @Override
-    public int deleteById(String id) {
-        return validator.isValidId(id) ? certificateDao.deleteById(Long.parseLong(id)) : 0;
+    public int deleteById(String id) throws ServiceValidationException {
+        validator.validateId(id);
+        return certificateDao.deleteById(Long.parseLong(id));
     }
 
     @Override
-    public int deleteTagFromCertificate(CertificateHasTagDto certificateHasTagDto) {
+    public int deleteTagFromCertificate(CertificateHasTagDto certificateHasTagDto)
+            throws ServiceValidationException {
         String certificateId = certificateHasTagDto.getCertificateId();
         String tagId = certificateHasTagDto.getTagId();
         int resultCountOfDeletes = 0;
-        if (validator.isValidId(certificateId) && validator.isValidId(tagId)) {
-            Long localCertificateId = Long.parseLong(certificateId);
-            Long localTagId = Long.parseLong(tagId);
-            resultCountOfDeletes =
-                    certificateDao.deleteTagFromCertificate(localCertificateId, localTagId);
-        }
+        validator.validateId(certificateId);
+        validator.validateId(tagId);
+        Long localCertificateId = Long.parseLong(certificateId);
+        Long localTagId = Long.parseLong(tagId);
+        resultCountOfDeletes =
+                certificateDao.deleteTagFromCertificate(localCertificateId, localTagId);
         return resultCountOfDeletes;
     }
 

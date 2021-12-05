@@ -62,24 +62,29 @@ public interface CertificateService {
      *
      * @param certificateHasTagDto the certificate has tag dto with parameters for creation
      * @return number of links created
+     * @throws ServiceValidationException the service validation exception
      */
-    int updateAddTagToCertificate(CertificateHasTagDto certificateHasTagDto);
+    int updateAddTagToCertificate(CertificateHasTagDto certificateHasTagDto)
+            throws ServiceValidationException;
 
     /**
      * Delete certificate by id.
      *
      * @param id the id
      * @return number of certificates removed
+     * @throws ServiceValidationException the service validation exception
      */
-    int deleteById(String id);
+    int deleteById(String id) throws ServiceValidationException;
 
     /**
      * Delete one certificate link with a tag.
      *
      * @param certificateHasTagDto the certificate has tag dto with parameters for removing
      * @return number of removed links
+     * @throws ServiceValidationException the service validation exception
      */
-    int deleteTagFromCertificate(CertificateHasTagDto certificateHasTagDto);
+    int deleteTagFromCertificate(CertificateHasTagDto certificateHasTagDto)
+            throws ServiceValidationException;
 
     /**
      * Convert certificate to certificate dto.

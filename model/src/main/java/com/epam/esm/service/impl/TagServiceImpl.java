@@ -67,8 +67,9 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public int deleteById(String id) {
-        return validator.isValidId(id) ? tagDao.deleteById(Long.parseLong(id)) : 0;
+    public int deleteById(String id) throws ServiceValidationException {
+        validator.validateId(id);
+        return tagDao.deleteById(Long.parseLong(id));
     }
 
     private TagDto checkTag(Optional<Tag> tag) throws ServiceSearchException {

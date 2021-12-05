@@ -51,6 +51,7 @@ public interface TagService {
      *
      * @param id the tag id
      * @return number of tags removed
+     * @throws ServiceValidationException the service validation exception
      */
-    int deleteById(String id);
+    int deleteById(String id) throws ServiceValidationException;
 }

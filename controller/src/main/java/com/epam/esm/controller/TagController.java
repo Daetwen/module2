@@ -52,7 +52,7 @@ public class TagController {
     }
 
     @RequestMapping(value="/tag_delete/{id}",method = RequestMethod.DELETE)
-    public int delete(@PathVariable String id) {
+    public int delete(@PathVariable String id) throws ServiceValidationException {
         return tagService.deleteById(id);
     }
 }

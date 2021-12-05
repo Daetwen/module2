@@ -58,17 +58,20 @@ public class CertificateController {
     }
 
     @RequestMapping(value="/certificate_update_tag", method = RequestMethod.PUT)
-    public int updateTagFromCertificate(@RequestBody CertificateHasTagDto certificateHasTagDto) {
+    public int updateTagFromCertificate(@RequestBody CertificateHasTagDto certificateHasTagDto)
+            throws ServiceValidationException {
         return certificateService.updateAddTagToCertificate(certificateHasTagDto);
     }
 
     @RequestMapping(value="/certificate_delete/{id}", method = RequestMethod.DELETE)
-    public int delete(@PathVariable String id) {
+    public int delete(@PathVariable String id)
+            throws ServiceValidationException {
         return certificateService.deleteById(id);
     }
 
     @RequestMapping(value="/certificate_delete_tag", method = RequestMethod.DELETE)
-    public int deleteTagFromCertificate(@RequestBody CertificateHasTagDto certificateHasTagDto) {
+    public int deleteTagFromCertificate(@RequestBody CertificateHasTagDto certificateHasTagDto)
+            throws ServiceValidationException {
         return certificateService.deleteTagFromCertificate(certificateHasTagDto);
     }
 

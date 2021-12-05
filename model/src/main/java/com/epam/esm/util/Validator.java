@@ -51,23 +51,6 @@ public class Validator {
         }
     }
 
-    public boolean isValidId(String id) {
-        boolean result = false;
-        if(StringUtils.isNotBlank(id) && id.matches(ID_REGEX)) {
-            try {
-                Long localId = Long.parseLong(id);
-                result = isValidId(localId);
-            } catch (NumberFormatException e) {
-                result = false;
-            }
-        }
-        return result;
-    }
-
-    public boolean isValidId(Long id) {
-        return (id != null || id > 1L);
-    }
-
     public boolean isValidName(String name) {
         return StringUtils.isNotBlank(name) ? name.matches(NAME_REGEX) : false;
     }

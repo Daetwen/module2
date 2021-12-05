@@ -1,8 +1,6 @@
-package com.epam.esm.verifier;
+package com.epam.esm.util;
 
 import com.epam.esm.exception.ServiceValidationException;
-import com.epam.esm.util.LocaleManager;
-import com.epam.esm.util.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -89,48 +87,6 @@ public class ValidatorTest {
         String name = "gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg";
         assertThrows(ServiceValidationException.class,
                 () -> validator.validateName(name));
-    }
-
-    @Test
-    public void isValidIdTestTrue() {
-        String id = "123";
-        boolean actual = validator.isValidId(id);
-        assertTrue(actual);
-    }
-
-    @Test
-    public void isValidIdTestFalse1() {
-        String id = "-1";
-        boolean actual = validator.isValidId(id);
-        assertFalse(actual);
-    }
-
-    @Test
-    public void isValidIdTestFalse2() {
-        String id = "9323372036854775807";
-        boolean actual = validator.isValidId(id);
-        assertFalse(actual);
-    }
-
-    @Test
-    public void isValidIdTestFalse3() {
-        String id = "";
-        boolean actual = validator.isValidId(id);
-        assertFalse(actual);
-    }
-
-    @Test
-    public void isValidIdTestFalse4() {
-        String id = "   ";
-        boolean actual = validator.isValidId(id);
-        assertFalse(actual);
-    }
-
-    @Test
-    public void isValidIdTestFalse5() {
-        String id = "<script>";
-        boolean actual = validator.isValidId(id);
-        assertFalse(actual);
     }
 
     @Test
