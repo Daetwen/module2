@@ -1,0 +1,7 @@
+/.idea/
+/.gradle/
+/build/
+/gradle/
+/controller/build/
+/database/build/
+/model/build/

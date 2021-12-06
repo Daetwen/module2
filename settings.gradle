@@ -1,0 +1,5 @@
+rootProject.name = 'module2'
+include 'database'
+include 'model'
+include 'controller'
+
