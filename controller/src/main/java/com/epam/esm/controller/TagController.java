@@ -9,7 +9,13 @@ import com.epam.esm.validator.ControllerValidator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -42,11 +48,10 @@ public class TagController {
             throws ControllerException, ServiceSearchException, ServiceValidationException {
         TagDto tagDto = new TagDto();
         controllerValidator.validateParameters(id, name);
-        if (StringUtils.isNotBlank(name)) {
-            tagDto = tagService.findByName(name);
-        }
         if (StringUtils.isNotBlank(id)) {
             tagDto = tagService.findById(id);
+        } else if (StringUtils.isNotBlank(name)) {
+            tagDto = tagService.findByName(name);
         }
         return tagDto;
     }

@@ -75,6 +75,13 @@ public class Validator {
                 isValidDuration(certificateDto.getDuration());
     }
 
+    public boolean isValidCertificateDto(CertificateDto certificateDto) {
+        return (certificateDto.getName() == null || isValidName(certificateDto.getName())) &&
+                isValidDescription(certificateDto.getDescription()) &&
+                (certificateDto.getPrice() == null || isValidPrice(certificateDto.getPrice())) &&
+                isValidDuration(certificateDto.getDuration());
+    }
+
     public boolean isValidTag(TagDto tagDto) {
         return isValidName(tagDto.getName());
     }

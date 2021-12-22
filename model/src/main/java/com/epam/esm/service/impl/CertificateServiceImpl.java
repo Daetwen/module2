@@ -82,7 +82,7 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public int update(CertificateDto certificateDto) {
         int resultCountOfUpdate = 0;
-        if (validator.isValidCertificate(certificateDto)) {
+        if (validator.isValidCertificateDto(certificateDto)) {
             resultCountOfUpdate = certificateDao.update(
                     CertificateService.super.convertCertificateDtoToCertificate(certificateDto));
         }
